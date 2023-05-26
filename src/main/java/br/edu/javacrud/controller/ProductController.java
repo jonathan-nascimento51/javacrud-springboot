@@ -31,17 +31,17 @@ public class ProductController {
 		return ResponseEntity.ok(allProducts);
 	}
 	
+	
 	@PostMapping									//uso o valid para fazer a verificação usando a classe RequestProductDTO, anotação a principio vai verificar os parametros passados e se corresponder ao que veio no body da requisição
 	public ResponseEntity registerProduct(@RequestBody @Valid RequestProductDTO data) {
-		
-		//System.out.println(data);				// se vir algum parametro com tipo errado, ou parametros a mais ou a menos, o @Valid vai fazer essa verificação atravez da classe.
-		
+													// se vir algum parametro com tipo errado, ou parametros a mais ou a menos, o @Valid vai fazer essa verificação atravez da classe.		
 		Product product = new Product(data);
 		
 		repository.save(product);
 		
 		return ResponseEntity.ok().build(); //ao usar ok() que é o status 200, se não colocar um corpo dentro do metodo, preciso usar o build().
 	}
+	
 	
 	@PutMapping
 	public ResponseEntity updateProduct(@RequestBody @Valid RequestProductDTO data) {
