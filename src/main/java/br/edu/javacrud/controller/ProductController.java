@@ -4,7 +4,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.edu.javacrud.domain.product.Product;
 import br.edu.javacrud.domain.product.ProductRepository;
 import br.edu.javacrud.domain.product.RequestProductDTO;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
@@ -27,7 +30,7 @@ public class ProductController {
 	@GetMapping
 	//responseEntity é apenas uma classe padrão para mandar respostas pro meu cliente;
 	public ResponseEntity getAllProducts() {		
-		var allProducts = repository.findAll();		
+		var allProducts = repository.findAllByActiveTrue();		
 		return ResponseEntity.ok(allProducts);
 	}
 	
@@ -44,6 +47,7 @@ public class ProductController {
 	
 	
 	@PutMapping
+	@Transactional
 	public ResponseEntity updateProduct(@RequestBody @Valid RequestProductDTO data) {
 		
 		Optional<Product> optionalProduct = repository.findById(data.id());
@@ -51,7 +55,6 @@ public class ProductController {
 			Product product = optionalProduct.get();
 			product.setName(data.name());
 			product.setPrice_in_cents(data.price_in_cents());
-			repository.save(product);
 			return ResponseEntity.ok(product);
 		} else {
 			return ResponseEntity.notFound().build();
@@ -59,7 +62,18 @@ public class ProductController {
 		
 	}
 	
-	 
-	
+	@DeleteMapping("/{id}")
+	@Transactional
+	public ResponseEntity deleteProduct(@PathVariable String id) {
+		
+		Optional<Product> optionalProduct = repository.findById(id);		
+		if(optionalProduct.isPresent()) {
+			Product product = optionalProduct.get();
+			product.setActive(false);			
+			return ResponseEntity.notFound().build();			
+		}else {
+			return ResponseEntity.badRequest().build();
+		}
+	}
 	
 }
